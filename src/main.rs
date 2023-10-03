@@ -1,45 +1,17 @@
 use std::{env, fs};
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 struct Entity {
-    name: String,
     initiative: usize,
-    health: isize,
+    name: String,
 }
 
-impl PartialEq for Entity {
-    fn eq(&self, other: &Self) -> bool {
-        self.initiative == other.initiative
-    }
-
-    fn ne(&self, other: &Self) -> bool {
-        self.initiative != other.initiative
-    }
-}
-
-impl PartialOrd for Entity {
-    fn lt(&self, other: &Self) -> bool {
-        self.initiative < other.initiative
-    }
-
-    fn le(&self, other: &Self) -> bool {
-        self.initiative <= other.initiative
-    }
-
-    fn gt(&self, other: &Self) -> bool {
-        self.initiative > other.initiative
-    }
-
-    fn ge(&self, other: &Self) -> bool {
-        self.initiative >= other.initiative
-    }
-
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        if self.initiative > other.initiative {
-            return Some(std::cmp::Ordering::Greater);
-        } else if self.initiative < other.initiative {
-            return Some(std::cmp::Ordering::Less);
-        } else {
-            return Some(std::cmp::Ordering::Equal);
+impl From<&str> for Entity {
+    fn from(value: &str) -> Self {
+        let fields: Vec<&str> = value.split(' ').collect();
+        Self {
+            initiative: fields[0].parse().unwrap(),
+            name: fields[1].to_string(),
         }
     }
 }
@@ -54,10 +26,14 @@ fn main() {
         filepath = String::from("inits.txt");
     }
 
-    let entities;
-    if let Ok(t) = fs::read_to_string(filepath) {
-        entities = t.lines();
-    } else {
-        return;
+    let file_contents = fs::read_to_string(filepath).unwrap();
+    let entity_strings = file_contents.lines();
+    let mut entities: Vec<Entity> = entity_strings.map(|f| Entity::from(f)).collect();
+
+    entities.sort_unstable();
+    entities.reverse();
+
+    for entity in entities {
+        println!("{}\t({})", entity.name, entity.initiative);
     }
 }
