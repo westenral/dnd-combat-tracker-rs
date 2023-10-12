@@ -135,6 +135,7 @@ fn main() {
                 }
 
                 fs::write(save_filepath, create_save_string(&entities)).unwrap();
+                println!("Saved to {}", save_filepath);
             }
             Some("print") => {
                 println!();
